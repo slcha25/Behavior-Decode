@@ -1,0 +1,7 @@
+{
+  "name": "Copy of BehaviorDecode＿FinalVersion",
+  "description": "A sophisticated video analysis tool leveraging Gemini Pro to decode human behavior, intentions, and psychological motivations through video content.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
