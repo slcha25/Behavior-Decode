@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Mic, MicOff, Bot, Loader2, User } from 'lucide-react';
+import { Send, Mic, MicOff, Bot, Loader2, User, Lock, Sparkles } from 'lucide-react';
 import { ChatMessage, Language } from '../types';
 import { createChatSession, transcribeAudio } from '../services/geminiService';
+import { canUseChat, getUsage } from '../services/usageService';
 import { Chat, GenerateContentResponse } from '@google/genai';
 
 interface VideoContent {
@@ -42,6 +43,9 @@ const ChatInterface: React.FC<Props> = ({ videoContent, language }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   
+  // Everyone has access now based on your update request
+  const hasAccess = canUseChat();
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -49,15 +53,8 @@ const ChatInterface: React.FC<Props> = ({ videoContent, language }) => {
 
   const getTexts = (lang: Language) => {
     switch (lang) {
-      case 'zh-TW': return { title: '行為分析助手', thinking: '思考中...', placeholder: '輸入您的問題...', error: '抱歉，發生錯誤，請重試。', greeting: "您好！我是您的行為分析助手。關於這段影片中的人物行為，您有什麼想問的嗎？" };
-      case 'zh-CN': return { title: '行为分析助手', thinking: '思考中...', placeholder: '输入您的问题...', error: '抱歉，发生错误，请重试。', greeting: "您好！我是您的行为分析助手。关于这段视频中的人物行为，您有什么想问的吗？" };
-      case 'ja': return { title: '行動分析アシスタント', thinking: '思考中...', placeholder: '質問を入力...', error: 'エラーが発生しました。もう一度お試しください。', greeting: "こんにちは！行動分析アシスタントです。この動画の登場人物の行動について、何か質問はありますか？" };
-      case 'ko': return { title: '행동 분석 도우미', thinking: '생각 중...', placeholder: '질문을 입력하세요...', error: '오류가 발생했습니다. 다시 시도해 주세요.', greeting: "안녕하세요! 행동 분석 도우미입니다. 이 영상 속 인물의 행동에 대해 궁금한 점이 있으신가요?" };
-      case 'es': return { title: 'Asistente de Análisis', thinking: 'Pensando...', placeholder: 'Escribe tu pregunta...', error: 'Ocurrió un error. Por favor intenta de nuevo.', greeting: "¡Hola! Soy tu asistente de análisis de comportamiento. ¿Qué te gustaría saber sobre el comportamiento en este video?" };
-      case 'fr': return { title: 'Assistant d\'Analyse', thinking: 'Réflexion...', placeholder: 'Tapez votre question...', error: 'Une erreur s\'est produite. Veuillez réessayer.', greeting: "Bonjour ! Je suis votre assistant d'analyse comportementale. Que souhaitez-vous savoir sur cette vidéo ?" };
-      case 'ru': return { title: 'Ассистент анализа', thinking: 'Думаю...', placeholder: 'Введите ваш вопрос...', error: 'Произошла ошибка. Пожалуйста, попробуйте снова.', greeting: "Привет! Я ваш помощник по анализу поведения. Что бы вы хотели узнать о поведении персонажей в этом видео?" };
-      case 'ar': return { title: 'مساعد تحليل السلوك', thinking: 'جاري التفكير...', placeholder: 'اكتب سؤالك...', error: 'حدث خطأ. حاول مرة أخرى.', greeting: "مرحبًا! أنا مساعد تحليل السلوك الخاص بك. ما الذي تود معرفته عن سلوك الشخصيات في هذا الفيديو؟" };
-      default: return { title: 'Behavioral Assistant', thinking: 'Thinking...', placeholder: 'Type your question...', error: 'I encountered an error. Please try again.', greeting: "Hello! I'm your behavior analysis assistant. What would you like to know about the characters' behavior in this video?" };
+      case 'zh-TW': return { title: '行為分析助手', thinking: '思考中...', placeholder: '輸入您的問題...', error: '抱歉，發生錯誤，請重試。', greeting: "您好！我是您的行為分析助手。關於這段影片中的人物行為，您有什麼想問的嗎？", locked: "此功能僅限專業版用戶使用", upgrade: "立即升級解鎖即時對話" };
+      default: return { title: 'Behavioral Assistant', thinking: 'Thinking...', placeholder: 'Type your question...', error: 'I encountered an error. Please try again.', greeting: "Hello! I'm your behavior analysis assistant. What would you like to know about the characters' behavior in this video?", locked: "AI Chat is for Premium users only", upgrade: "Upgrade to Premium to unlock" };
     }
   };
 
@@ -69,14 +66,16 @@ const ChatInterface: React.FC<Props> = ({ videoContent, language }) => {
 
   // Initialize chat session once on mount or when language changes
   useEffect(() => {
-    chatSessionRef.current = createChatSession(videoContent, language);
-    setMessages([{
-      id: 'init',
-      role: 'model',
-      text: t.greeting,
-      timestamp: new Date()
-    }]);
-  }, [videoContent, language]); 
+    if (hasAccess) {
+      chatSessionRef.current = createChatSession(videoContent, language);
+      setMessages([{
+        id: 'init',
+        role: 'model',
+        text: t.greeting,
+        timestamp: new Date()
+      }]);
+    }
+  }, [videoContent, language, hasAccess]); 
 
   const handleSend = async () => {
     if (!input.trim() || isLoading || !chatSessionRef.current) return;
@@ -99,7 +98,6 @@ const ChatInterface: React.FC<Props> = ({ videoContent, language }) => {
       const botMsgId = (Date.now() + 1).toString();
       let fullText = "";
       
-      // Add placeholder message for streaming
       setMessages(prev => [...prev, {
         id: botMsgId,
         role: 'model',
@@ -156,7 +154,6 @@ const ChatInterface: React.FC<Props> = ({ videoContent, language }) => {
         } finally {
           setIsLoading(false);
         }
-        // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
       };
 

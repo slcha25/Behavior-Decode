@@ -1,9 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>BehaviorDecode - AI Behavior Analysis</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BehaviorDecode" />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" />
+    <link rel="manifest" href="manifest.json" />
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -40,6 +50,8 @@
       body {
         background-color: #f8fafc;
         color: #1e293b;
+        /* Prevent bounce on iOS */
+        overscroll-behavior-y: none;
       }
       /* Custom scrollbar for cleaner look */
       ::-webkit-scrollbar {
@@ -54,6 +66,16 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
+      }
+      
+      /* PWA splash screen avoidance and safe area padding */
+      @media (display-mode: standalone) {
+        header {
+          padding-top: env(safe-area-inset-top);
+        }
+        body {
+          padding-bottom: env(safe-area-inset-bottom);
+        }
       }
     </style>
   <script type="importmap">

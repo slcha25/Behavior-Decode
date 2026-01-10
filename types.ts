@@ -1,6 +1,25 @@
 
 export type Language = 'en' | 'zh-TW' | 'zh-CN' | 'ja' | 'ko' | 'es' | 'fr' | 'ru' | 'ar';
 
+export type UserPlan = 'free' | 'basic' | 'premium';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  createdAt: string;
+}
+
+export interface UsageState {
+  plan: UserPlan;
+  creditsRemaining: number;
+  totalAnalyses: number;
+  lastResetDate: string;
+}
+
 export interface EmotionalDataPoint {
   time: string;
   intensity: number;
@@ -8,6 +27,9 @@ export interface EmotionalDataPoint {
 }
 
 export interface AnalysisReport {
+  id?: string;
+  date?: string;
+  videoName?: string;
   summary: string;
   personality: string;
   intentions: string;
@@ -33,6 +55,9 @@ export enum AppState {
   IDLE = 'IDLE',
   ANALYZING = 'ANALYZING',
   REPORT = 'REPORT',
+  PROFILE = 'PROFILE',
+  HISTORY = 'HISTORY',
+  ACCOUNT_DETAILS = 'ACCOUNT_DETAILS'
 }
 
 export enum ModelType {
