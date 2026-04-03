@@ -91,7 +91,8 @@ Behavior-Decode/
 └── tailwind.config.js
 ```
 ## 🌍 Supported Languages
-
+|   |   |
+|---|---|
 | English (en) | Traditional Chinese (zh-TW) | 
 | Simplified Chinese (zh-CN) | Japanese (ja) | 
 | Korean (ko) | Spanish (es) | 
