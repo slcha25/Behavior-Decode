@@ -92,7 +92,11 @@ Behavior-Decode/
 ```
 ## 🌍 Supported Languages
 
-- English (en) | Traditional Chinese (zh-TW) | Simplified Chinese (zh-CN) | Japanese (ja) | Korean (ko) | Spanish (es) | French (fr) | Russian (ru) | Arabic (ar) - with RTL support
+| English (en) | Traditional Chinese (zh-TW) | 
+| Simplified Chinese (zh-CN) | Japanese (ja) | 
+| Korean (ko) | Spanish (es) | 
+| French (fr) | Russian (ru) | 
+| Arabic (ar) - with RTL support |
 
 ## 🔒 Data Privacy
 
